@@ -97,13 +97,6 @@ dioxus_platform_bridge::java_plugin!(
     plugin = "geolocation",
     files = ["src/android/PermissionsHelper.java"]
 );
-
-#[cfg(any(target_os = "ios", target_os = "macos"))]
-dioxus_platform_bridge::darwin_plugin!(
-    plugin = "geolocation",
-    frameworks = ["CoreLocation", "Foundation"]
-);
-
 // Error types
 /// Result type for geolocation operations
 pub type Result<T> = std::result::Result<T, Error>;
@@ -176,10 +169,7 @@ pub const BACKGROUND_LOCATION: Permission = static_permission!(
     Custom {
         android = "android.permission.ACCESS_BACKGROUND_LOCATION",
         ios = "NSLocationAlwaysAndWhenInUseUsageDescription",
-        macos = "NSLocationUsageDescription",
-        windows = "location",
-        linux = "",
-        web = ""
+        macos = "NSLocationUsageDescription"
     },
     description = "Background location access"
 );
