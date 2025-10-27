@@ -77,7 +77,7 @@ mod web;
 
 // Re-export web-specific async API for proper usage on web
 #[cfg(target_arch = "wasm32")]
-pub use web::get_current_position;
+pub use web::{get_current_position, get_current_position_sync};
 
 #[cfg(not(any(
     target_os = "android",
@@ -224,14 +224,16 @@ fn __ensure_metadata_linked() {
 ///
 /// - **Android**: Calls `ActivityCompat.requestPermissions()` via JNI
 /// - **iOS/macOS**: Calls `CLLocationManager.requestWhenInUseAuthorization()` via objc2
-/// - **Web**: Checks if Geolocation API is available (permission requested on first use)
+/// - **Web**: Initiates geolocation request (triggers permission dialog and populates cache)
 /// - **Other platforms**: Always returns `false`
 ///
 /// ## Usage
 ///
 /// Call this function before `last_known_location()` to ensure permissions are granted.
-/// The user will see a system dialog asking for location permission (except on web,
-/// where permission is requested when calling the Geolocation API).
+/// The user will see a system dialog asking for location permission.
+///
+/// On web, this also starts fetching the location asynchronously. You can then
+/// call `last_known_location()` after a short delay to retrieve the cached result.
 pub fn request_location_permission() -> bool {
     // Ensure permissions and metadata are linked (prevents dead code elimination)
     __ensure_permissions_linked();
@@ -261,8 +263,27 @@ pub fn request_location_permission() -> bool {
 ///
 /// - **Android**: Queries `LocationManager.getLastKnownLocation()` via JNI
 /// - **iOS/macOS**: Queries `CLLocationManager.location` via objc2
-/// - **Web**: Always returns `None` (web geolocation is async-only, use `getCurrentPosition`)
+/// - **Web**: Returns cached position (must call `get_current_position_sync()` first to populate cache)
 /// - **Other platforms**: Always returns `None`
+///
+/// ## Web Usage
+///
+/// On web, you need to initiate a location request first:
+///
+/// ```rust,no_run
+/// #[cfg(target_arch = "wasm32")]
+/// {
+///     use dioxus_mobile_geolocation::{get_current_position_sync, last_known_location};
+///     
+///     // Initiate location request (async, populates cache when ready)
+///     get_current_position_sync();
+///     
+///     // Later, check if location is available
+///     if let Some((lat, lon)) = last_known_location() {
+///         println!("Location: {}, {}", lat, lon);
+///     }
+/// }
+/// ```
 ///
 /// ## Permissions
 ///
