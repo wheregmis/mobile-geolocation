@@ -200,8 +200,6 @@ pub fn __ensure_permissions_linked() {
 fn __ensure_metadata_linked() {
     // Metadata is automatically linked via the macro-generated static
     // The #[link_section] and #[used] attributes ensure the data is included
-    #[cfg(target_os = "ios")]
-    let _ = &IOS_FRAMEWORK_METADATA;
     // macOS uses the same ios_plugin! macro, so metadata is handled there
 }
 
