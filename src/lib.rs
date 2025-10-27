@@ -1,10 +1,11 @@
-//! Cross-platform geolocation for Dioxus mobile and desktop apps
+//! Cross-platform geolocation for Dioxus mobile, desktop, and web apps
 //!
-//! This crate provides geolocation functionality for Android, iOS, and macOS platforms
+//! This crate provides geolocation functionality for Android, iOS, macOS, and Web platforms
 //! using clean, direct bindings without external build tools. Android uses JNI
 //! with a single Java file compiled to DEX, while iOS and macOS use objc2 for direct
-//! Objective-C bindings to the CoreLocation framework. Permissions are automatically
-//! embedded via linker symbols and injected into platform manifests by the Dioxus CLI.
+//! Objective-C bindings to the CoreLocation framework. Web uses the browser's Geolocation API
+//! via wasm-bindgen. Permissions are automatically embedded via linker symbols and injected
+//! into platform manifests by the Dioxus CLI.
 //!
 //! ## Features
 //!
@@ -17,8 +18,37 @@
 //! ```rust,no_run
 //! use dioxus_mobile_geolocation::last_known_location;
 //!
+//! // For Android, iOS, and macOS
 //! if let Some((lat, lon)) = last_known_location() {
 //!     println!("Location: {}, {}", lat, lon);
+//! }
+//! ```
+//!
+//! ### Web Platform
+//!
+//! On web, geolocation is asynchronous. Use the `get_current_position` function:
+//!
+//! ```rust,no_run
+//! #[cfg(target_arch = "wasm32")]
+//! use dioxus_mobile_geolocation::get_current_position;
+//! #[cfg(target_arch = "wasm32")]
+//! use wasm_bindgen::prelude::*;
+//!
+//! #[cfg(target_arch = "wasm32")]
+//! {
+//!     let success = Closure::wrap(Box::new(|pos: web_sys::Position| {
+//!         let coords = pos.coords();
+//!         println!("Lat: {}, Lon: {}", coords.latitude(), coords.longitude());
+//!     }) as Box<dyn Fn(web_sys::Position)>);
+//!     
+//!     let error = Closure::wrap(Box::new(|err: web_sys::PositionError| {
+//!         eprintln!("Error: {}", err.message());
+//!     }) as Box<dyn Fn(web_sys::PositionError)>);
+//!     
+//!     get_current_position(
+//!         success.as_ref().unchecked_ref(),
+//!         Some(error.into_js_value().unchecked_into())
+//!     );
 //! }
 //! ```
 //!
@@ -41,7 +71,20 @@ mod android;
 #[cfg(any(target_os = "ios", target_os = "macos"))]
 mod darwin;
 
-#[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
+// Web platform uses browser's Geolocation API
+#[cfg(target_arch = "wasm32")]
+mod web;
+
+// Re-export web-specific async API for proper usage on web
+#[cfg(target_arch = "wasm32")]
+pub use web::get_current_position;
+
+#[cfg(not(any(
+    target_os = "android",
+    target_os = "ios",
+    target_os = "macos",
+    target_arch = "wasm32"
+)))]
 mod unsupported;
 
 use permissions::{static_permission, Permission};
@@ -180,13 +223,15 @@ fn __ensure_metadata_linked() {
 /// ## Platform behavior
 ///
 /// - **Android**: Calls `ActivityCompat.requestPermissions()` via JNI
-/// - **iOS**: Calls `CLLocationManager.requestWhenInUseAuthorization()` via objc2
+/// - **iOS/macOS**: Calls `CLLocationManager.requestWhenInUseAuthorization()` via objc2
+/// - **Web**: Checks if Geolocation API is available (permission requested on first use)
 /// - **Other platforms**: Always returns `false`
 ///
 /// ## Usage
 ///
 /// Call this function before `last_known_location()` to ensure permissions are granted.
-/// The user will see a system dialog asking for location permission.
+/// The user will see a system dialog asking for location permission (except on web,
+/// where permission is requested when calling the Geolocation API).
 pub fn request_location_permission() -> bool {
     // Ensure permissions and metadata are linked (prevents dead code elimination)
     __ensure_permissions_linked();
@@ -196,7 +241,14 @@ pub fn request_location_permission() -> bool {
     return android::request_permission();
     #[cfg(any(target_os = "ios", target_os = "macos"))]
     return darwin::request_permission();
-    #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
+    #[cfg(target_arch = "wasm32")]
+    return web::request_permission();
+    #[cfg(not(any(
+        target_os = "android",
+        target_os = "ios",
+        target_os = "macos",
+        target_arch = "wasm32"
+    )))]
     return unsupported::request_permission();
 }
 
@@ -208,7 +260,8 @@ pub fn request_location_permission() -> bool {
 /// ## Platform behavior
 ///
 /// - **Android**: Queries `LocationManager.getLastKnownLocation()` via JNI
-/// - **iOS**: Queries `CLLocationManager.location` via objc2
+/// - **iOS/macOS**: Queries `CLLocationManager.location` via objc2
+/// - **Web**: Always returns `None` (web geolocation is async-only, use `getCurrentPosition`)
 /// - **Other platforms**: Always returns `None`
 ///
 /// ## Permissions
@@ -220,7 +273,9 @@ pub fn request_location_permission() -> bool {
 /// On Android, you should request permissions using `request_location_permission()`
 /// before calling this function.
 ///
-/// On iOS, permissions are handled via Info.plist configuration.
+/// On iOS/macOS, permissions are handled via Info.plist configuration.
+///
+/// On Web, permissions are requested automatically when you call the Geolocation API.
 pub fn last_known_location() -> Option<(f64, f64)> {
     // Ensure permissions and metadata are linked (prevents dead code elimination)
     __ensure_permissions_linked();
@@ -230,6 +285,13 @@ pub fn last_known_location() -> Option<(f64, f64)> {
     return android::last_known();
     #[cfg(any(target_os = "ios", target_os = "macos"))]
     return darwin::last_known();
-    #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
+    #[cfg(target_arch = "wasm32")]
+    return web::last_known();
+    #[cfg(not(any(
+        target_os = "android",
+        target_os = "ios",
+        target_os = "macos",
+        target_arch = "wasm32"
+    )))]
     return unsupported::last_known();
 }
