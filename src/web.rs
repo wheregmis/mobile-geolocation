@@ -5,7 +5,6 @@
 //! The sync `last_known()` function returns cached position if available.
 
 use std::cell::RefCell;
-use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{Position, PositionError, PositionOptions};
@@ -81,10 +80,10 @@ pub fn get_current_position_sync() -> bool {
         // Silently ignore errors for the sync API
     }) as Box<dyn FnMut(PositionError)>);
 
-    let mut options = PositionOptions::new();
-    options.enable_high_accuracy(false); // Use network location for faster response
-    options.timeout(10000);
-    options.maximum_age(60000); // Allow cached positions up to 1 minute old
+    let options = PositionOptions::new();
+    options.set_enable_high_accuracy(false); // Use network location for faster response
+    options.set_timeout(10000);
+    options.set_maximum_age(60000); // Allow cached positions up to 1 minute old
 
     let result = geolocation.get_current_position_with_error_callback_and_options(
         success.as_ref().unchecked_ref(),
@@ -110,12 +109,14 @@ pub fn get_current_position(
 ) -> Result<(), JsValue> {
     let window = web_sys::window().ok_or("No window object")?;
     let navigator = window.navigator();
-    let geolocation = navigator.geolocation().map_err(|_| "Geolocation not available")?;
+    let geolocation = navigator
+        .geolocation()
+        .map_err(|_| "Geolocation not available")?;
 
-    let mut options = PositionOptions::new();
-    options.enable_high_accuracy(true);
-    options.timeout(10000); // 10 second timeout
-    options.maximum_age(0); // Don't use cached position
+    let options = PositionOptions::new();
+    options.set_enable_high_accuracy(true);
+    options.set_timeout(10000); // 10 second timeout
+    options.set_maximum_age(0); // Don't use cached position
 
     geolocation
         .get_current_position_with_error_callback_and_options(

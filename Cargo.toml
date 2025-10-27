@@ -49,6 +49,7 @@ web-sys = { version = "0.3", features = [
     "Position",
     "PositionError",
     "PositionOptions",
+    "Coordinates",
     "Window",
 ] }
 js-sys = "0.3"
