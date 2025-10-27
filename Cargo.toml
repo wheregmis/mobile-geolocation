@@ -3,9 +3,9 @@ name = "dioxus-mobile-geolocation"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Cross-platform geolocation for Dioxus mobile apps"
+description = "Cross-platform geolocation for Dioxus mobile and desktop apps (Android, iOS, macOS)"
 repository = "https://github.com/DioxusLabs/dioxus"
-keywords = ["dioxus", "geolocation", "mobile", "android", "ios"]
+keywords = ["dioxus", "geolocation", "mobile", "android", "ios", "macos"]
 categories = ["gui", "mobile"]
 
 [features]
@@ -28,6 +28,13 @@ jni = "0.21"
 ndk-context = "0.1.1"
 
 [target.'cfg(target_os = "ios")'.dependencies]
+objc2 = "0.6.3"
+objc2-core-location = { version = "0.3.2", features = [
+    "CLLocationManager",
+    "CLLocation",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6.3"
 objc2-core-location = { version = "0.3.2", features = [
     "CLLocationManager",

@@ -1,35 +1,13 @@
+//! Darwin platform (iOS and macOS) geolocation implementation
+//!
+//! Both iOS and macOS use the same CoreLocation framework and share identical
+//! APIs for location services. This module provides a unified implementation
+//! for both platforms.
+
+use dioxus_platform_bridge::darwin::MainThreadCell;
 use objc2::rc::Retained;
 use objc2::MainThreadMarker;
-use objc2_core_location::{CLLocation, CLLocationManager, CLAuthorizationStatus};
-use std::cell::UnsafeCell;
-
-/// A cell that stores values only accessible on the main thread.
-struct MainThreadCell<T>(UnsafeCell<Option<T>>);
-
-impl<T> MainThreadCell<T> {
-    const fn new() -> Self {
-        Self(UnsafeCell::new(None))
-    }
-
-    fn get_or_init_with<F>(&self, _mtm: MainThreadMarker, init: F) -> &T
-    where
-        F: FnOnce() -> T,
-    {
-        // SAFETY: Access is guarded by requiring a `MainThreadMarker`, so this
-        // is only touched from the main thread.
-        unsafe {
-            let slot = &mut *self.0.get();
-            if slot.is_none() {
-                *slot = Some(init());
-            }
-            slot.as_ref().expect("LOCATION_MANAGER initialized")
-        }
-    }
-}
-
-// SAFETY: `MainThreadCell` enforces main-thread-only access through
-// `MainThreadMarker`.
-unsafe impl<T> Sync for MainThreadCell<T> {}
+use objc2_core_location::{CLAuthorizationStatus, CLLocation, CLLocationManager};
 
 /// Global location manager instance
 static LOCATION_MANAGER: MainThreadCell<Retained<CLLocationManager>> = MainThreadCell::new();
@@ -53,15 +31,12 @@ pub fn request_permission() -> bool {
 
     // Check authorization status first
     let auth_status = unsafe { manager.authorizationStatus() };
-    
+
     // Only request if not determined (NotDetermined)
-    match auth_status {
-        CLAuthorizationStatus::NotDetermined => {
-            unsafe {
-                manager.requestWhenInUseAuthorization();
-            }
+    if auth_status == CLAuthorizationStatus::NotDetermined {
+        unsafe {
+            manager.requestWhenInUseAuthorization();
         }
-        _ => {} // Already determined, don't request again
     }
 
     true
@@ -69,19 +44,16 @@ pub fn request_permission() -> bool {
 
 /// Get the last known location
 pub fn last_known() -> Option<(f64, f64)> {
-    let Some(mtm) = MainThreadMarker::new() else {
-        return None;
-    };
+    let mtm = MainThreadMarker::new()?;
 
     let manager = get_location_manager(mtm);
 
     // Check authorization status before attempting to get location
     let auth_status = unsafe { manager.authorizationStatus() };
-    
+
     // Only proceed if authorized
     match auth_status {
-        CLAuthorizationStatus::AuthorizedAlways | 
-        CLAuthorizationStatus::AuthorizedWhenInUse => {
+        CLAuthorizationStatus::AuthorizedAlways | CLAuthorizationStatus::AuthorizedWhenInUse => {
             // Can proceed to get location
         }
         _ => {
@@ -92,7 +64,7 @@ pub fn last_known() -> Option<(f64, f64)> {
 
     // First, try to get the cached location without starting updates
     let location: Option<Retained<CLLocation>> = unsafe { manager.location() };
-    
+
     if location.is_some() {
         let loc = location.unwrap();
         let coordinate = unsafe { loc.coordinate() };
@@ -106,7 +78,7 @@ pub fn last_known() -> Option<(f64, f64)> {
     unsafe {
         manager.startUpdatingLocation();
     }
-    
+
     // Wait for location to be obtained (allowing GPS to get a fix)
     std::thread::sleep(std::time::Duration::from_millis(1000));
 
@@ -123,4 +95,3 @@ pub fn last_known() -> Option<(f64, f64)> {
         (coordinate.latitude, coordinate.longitude)
     })
 }
-

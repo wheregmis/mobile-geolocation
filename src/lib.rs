@@ -1,10 +1,10 @@
-//! Cross-platform geolocation for Dioxus mobile apps
+//! Cross-platform geolocation for Dioxus mobile and desktop apps
 //!
-//! This crate provides geolocation functionality for Android and iOS platforms
+//! This crate provides geolocation functionality for Android, iOS, and macOS platforms
 //! using clean, direct bindings without external build tools. Android uses JNI
-//! with a single Java file compiled to DEX, while iOS uses objc2 for direct
-//! Objective-C bindings. Permissions are automatically embedded via linker symbols
-//! and injected into platform manifests by the Dioxus CLI.
+//! with a single Java file compiled to DEX, while iOS and macOS use objc2 for direct
+//! Objective-C bindings to the CoreLocation framework. Permissions are automatically
+//! embedded via linker symbols and injected into platform manifests by the Dioxus CLI.
 //!
 //! ## Features
 //!
@@ -37,10 +37,11 @@
 #[cfg(target_os = "android")]
 mod android;
 
-#[cfg(target_os = "ios")]
-mod ios;
+// Darwin-based platforms (iOS and macOS) share the same CoreLocation implementation
+#[cfg(any(target_os = "ios", target_os = "macos"))]
+mod darwin;
 
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
 mod unsupported;
 
 use permissions::{static_permission, Permission};
@@ -54,8 +55,8 @@ dioxus_platform_bridge::java_plugin!(
     files = ["src/android/PermissionsHelper.java"]
 );
 
-#[cfg(target_os = "ios")]
-dioxus_platform_bridge::ios_plugin!(
+#[cfg(any(target_os = "ios", target_os = "macos"))]
+dioxus_platform_bridge::darwin_plugin!(
     plugin = "geolocation",
     frameworks = ["CoreLocation", "Foundation"]
 );
@@ -168,6 +169,7 @@ fn __ensure_metadata_linked() {
     // The #[link_section] and #[used] attributes ensure the data is included
     #[cfg(target_os = "ios")]
     let _ = &IOS_FRAMEWORK_METADATA;
+    // macOS uses the same ios_plugin! macro, so metadata is handled there
 }
 
 /// Request location permissions at runtime.
@@ -192,9 +194,9 @@ pub fn request_location_permission() -> bool {
 
     #[cfg(target_os = "android")]
     return android::request_permission();
-    #[cfg(target_os = "ios")]
-    return ios::request_permission();
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(any(target_os = "ios", target_os = "macos"))]
+    return darwin::request_permission();
+    #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
     return unsupported::request_permission();
 }
 
@@ -226,8 +228,8 @@ pub fn last_known_location() -> Option<(f64, f64)> {
 
     #[cfg(target_os = "android")]
     return android::last_known();
-    #[cfg(target_os = "ios")]
-    return ios::last_known();
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(any(target_os = "ios", target_os = "macos"))]
+    return darwin::last_known();
+    #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "macos")))]
     return unsupported::last_known();
 }

@@ -48,7 +48,7 @@ dependencies = [
 [[package]]
 name = "const-serialize"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize-macro",
 ]
@@ -56,7 +56,7 @@ dependencies = [
 [[package]]
 name = "const-serialize-macro"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -81,7 +81,7 @@ dependencies = [
 [[package]]
 name = "dioxus-platform-bridge"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
@@ -193,7 +193,7 @@ dependencies = [
 [[package]]
 name = "permissions"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize",
  "permissions-core",
@@ -203,7 +203,7 @@ dependencies = [
 [[package]]
 name = "permissions-core"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
@@ -213,7 +213,7 @@ dependencies = [
 [[package]]
 name = "permissions-macro"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize",
  "permissions-core",
@@ -225,7 +225,7 @@ dependencies = [
 [[package]]
 name = "platform-bridge-macro"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#22a258c344bd8a384f469d06b851453f6a4f1e5f"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#133ea992d542ad61ce832a02fb003bc9f47776fd"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
