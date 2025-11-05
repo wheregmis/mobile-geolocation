@@ -17,14 +17,14 @@ background-location = []
 [dependencies]
 permissions = { git = "https://github.com/wheregmis/dioxus.git", branch = "native_api_testing" }
 permissions-core = { git = "https://github.com/wheregmis/dioxus.git", branch = "native_api_testing" }
-cfg-if = "1.0"
+cfg-if = "1.0.4"
 dioxus-platform-bridge = { git = "https://github.com/wheregmis/dioxus.git", branch = "native_api_testing", features = [
     "metadata",
 ] }
 const-serialize = { git = "https://github.com/wheregmis/dioxus.git", branch = "native_api_testing" }
 
 [target.'cfg(target_os = "android")'.dependencies]
-jni = "0.21"
+jni = "0.21.1"
 ndk-context = "0.1.1"
 
 [target.'cfg(target_os = "ios")'.dependencies]
@@ -42,8 +42,8 @@ objc2-core-location = { version = "0.3.2", features = [
 ] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = [
+wasm-bindgen = "0.2.105"
+web-sys = { version = "0.3.82", features = [
     "Geolocation",
     "Navigator",
     "Position",
@@ -52,7 +52,7 @@ web-sys = { version = "0.3", features = [
     "Coordinates",
     "Window",
 ] }
-js-sys = "0.3"
+js-sys = "0.3.82"
 
 
 # [package.metadata.docs.rs]

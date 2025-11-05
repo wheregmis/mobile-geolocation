@@ -88,6 +88,7 @@ pub use web::{get_current_position, get_current_position_sync};
 mod unsupported;
 
 use permissions::{static_permission, Permission};
+use permissions_core::{LocationPrecision, PermissionBuilder};
 
 // Declare Java sources for Android using the macro system
 // This embeds absolute paths and generates linker symbols automatically
@@ -151,28 +152,27 @@ pub struct Coordinates {
 }
 
 // Embed location permissions as linker symbols when features are enabled
+// Use the builder pattern required by the updated permissions crate API
 #[cfg(feature = "location-fine")]
-pub const LOCATION_FINE: Permission = static_permission!(
-    Location(Fine),
-    description = "Precise location for geolocation features"
-);
+pub const LOCATION_FINE: Permission =
+    static_permission!(PermissionBuilder::location(LocationPrecision::Fine)
+        .with_description("Precise location for geolocation features")
+        .build());
 
 #[cfg(feature = "location-coarse")]
-pub const LOCATION_COARSE: Permission = static_permission!(
-    Location(Coarse),
-    description = "Approximate location for geolocation features"
-);
+pub const LOCATION_COARSE: Permission =
+    static_permission!(PermissionBuilder::location(LocationPrecision::Coarse)
+        .with_description("Approximate location for geolocation features")
+        .build());
 
 // Optional background location (Android + iOS)
 #[cfg(feature = "background-location")]
-pub const BACKGROUND_LOCATION: Permission = static_permission!(
-    Custom {
-        android = "android.permission.ACCESS_BACKGROUND_LOCATION",
-        ios = "NSLocationAlwaysAndWhenInUseUsageDescription",
-        macos = "NSLocationUsageDescription"
-    },
-    description = "Background location access"
-);
+pub const BACKGROUND_LOCATION: Permission = static_permission!(PermissionBuilder::custom()
+    .with_android("android.permission.ACCESS_BACKGROUND_LOCATION")
+    .with_ios("NSLocationAlwaysAndWhenInUseUsageDescription")
+    .with_macos("NSLocationUsageDescription")
+    .with_description("Background location access")
+    .build());
 
 /// Internal function to ensure permission constants are linked into the binary.
 /// This prevents the linker from optimizing them away as dead code.
