@@ -54,7 +54,7 @@ dependencies = [
 [[package]]
 name = "const-serialize"
 version = "0.7.0"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize-macro",
 ]
@@ -62,7 +62,7 @@ dependencies = [
 [[package]]
 name = "const-serialize-macro"
 version = "0.7.0"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "dioxus-platform-bridge"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
@@ -114,7 +114,7 @@ dependencies = [
 [[package]]
 name = "dx-macro-helpers"
 version = "0.7.0"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "proc-macro2",
@@ -229,7 +229,7 @@ checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 [[package]]
 name = "permissions"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "dx-macro-helpers",
@@ -240,7 +240,7 @@ dependencies = [
 [[package]]
 name = "permissions-core"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
@@ -250,7 +250,7 @@ dependencies = [
 [[package]]
 name = "permissions-macro"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "dx-macro-helpers",
@@ -263,7 +263,7 @@ dependencies = [
 [[package]]
 name = "platform-bridge-macro"
 version = "0.7.0-rc.3"
-source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#1b49362cae47434ad915971534414cbb3afd190e"
+source = "git+https://github.com/wheregmis/dioxus.git?branch=native_api_testing#a94a7a3a5e8eee80060de9d66a53aabfcf554f96"
 dependencies = [
  "const-serialize",
  "const-serialize-macro",
@@ -337,9 +337,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.108"
+version = "2.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da58917d35242480a05c2897064da0a80589a2a0476c9a3f2fdc83b53502e917"
+checksum = "2f17c7e013e88258aa9543dcbe81aca68a667a9ac37cd69c9fbc07858bfe0e2f"
 dependencies = [
  "proc-macro2",
  "quote",

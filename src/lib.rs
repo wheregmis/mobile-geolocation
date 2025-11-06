@@ -174,35 +174,6 @@ pub const BACKGROUND_LOCATION: Permission = static_permission!(PermissionBuilder
     .with_description("Background location access")
     .build());
 
-/// Internal function to ensure permission constants are linked into the binary.
-/// This prevents the linker from optimizing them away as dead code.
-/// DO NOT REMOVE - this is required for the permission system to work.
-#[doc(hidden)]
-#[inline(never)]
-pub fn __ensure_permissions_linked() {
-    #[cfg(feature = "location-fine")]
-    {
-        let _ = &LOCATION_FINE;
-    }
-    #[cfg(feature = "location-coarse")]
-    {
-        let _ = &LOCATION_COARSE;
-    }
-    #[cfg(feature = "background-location")]
-    {
-        let _ = &BACKGROUND_LOCATION;
-    }
-}
-
-/// Ensure metadata is linked into the binary
-#[inline(never)]
-#[doc(hidden)]
-fn __ensure_metadata_linked() {
-    // Metadata is automatically linked via the macro-generated static
-    // The #[link_section] and #[used] attributes ensure the data is included
-    // macOS uses the same ios_plugin! macro, so metadata is handled there
-}
-
 /// Request location permissions at runtime.
 ///
 /// This function triggers the system permission dialog for location access.
@@ -223,10 +194,6 @@ fn __ensure_metadata_linked() {
 /// On web, this also starts fetching the location asynchronously. You can then
 /// call `last_known_location()` after a short delay to retrieve the cached result.
 pub fn request_location_permission() -> bool {
-    // Ensure permissions and metadata are linked (prevents dead code elimination)
-    __ensure_permissions_linked();
-    __ensure_metadata_linked();
-
     #[cfg(target_os = "android")]
     return android::request_permission();
     #[cfg(any(target_os = "ios", target_os = "macos"))]
@@ -286,10 +253,6 @@ pub fn request_location_permission() -> bool {
 ///
 /// On Web, permissions are requested automatically when you call the Geolocation API.
 pub fn last_known_location() -> Option<(f64, f64)> {
-    // Ensure permissions and metadata are linked (prevents dead code elimination)
-    __ensure_permissions_linked();
-    __ensure_metadata_linked();
-
     #[cfg(target_os = "android")]
     return android::last_known();
     #[cfg(any(target_os = "ios", target_os = "macos"))]
